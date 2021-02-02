@@ -1,0 +1,66 @@
+---
+title: "Data Product Project 1"
+author: "KevLee"
+date: "1/27/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Description
+Host your webpage on either GitHub Pages, RPubs, or NeoCities.
+
+Your webpage must contain the date that you created the document, and it must contain a map created with Leaflet. We would love to see you show off your creativity!
+
+## Load Packages
+```{r}
+library(leaflet)
+```
+```{r}
+library(htmltools)
+```
+
+```{r}
+library(tidygeocoder)
+```
+
+## Import data
+
+Use R Built-in data set USArrests
+```{r}
+data('USArrests')
+data <- USArrests
+```
+Organize data
+
+```{r}
+data <- data.frame(cbind(State = rownames(data),data))
+rownames(data) <- 1:nrow(data)
+data$TT_Arrest <- data$Murder + data$Assault +data$UrbanPop +data$Rape
+```
+load state info data
+```{r}
+state <- read.csv('statelatlong.csv')
+```
+join two datasets
+```{r}
+data <- merge(data, state, by.x = 'State' , by.y = 'City')
+```
+## Leaflet Map
+
+```{r}
+map <- data %>%
+  leaflet() %>%
+  addTiles() %>%
+  setView(lat = 40, lng = -95, zoom =4) %>%
+  addMarkers(popup = 'Murder') %>%
+  addCircles(weight=1,radius = data$Murder*30000)
+
+```
+```{r}
+map
+```
